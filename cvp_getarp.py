@@ -39,10 +39,12 @@
 #            -p --password <password> If omitted, password will be prompted.
 #            -d <EOS device either hostname or ip address, or a list ','separated
 #            -a <arp-ip-address> If omitted, the complete ARP table will be displayed of the device(s) from -d
+#            =x Exclude a specific interface such as vxlan
 #            -v verbose level=1,2, if level-identifier is omitted default=1
 #
 # Revision Level: 1.0 Date 29/5/2020
 #                 1.1 Date 4/6/2020 Minor changes
+#                 1.2 Date 2/9/20 Added -x to exclude an interface
 #
 # Note: For any question of comment: please email ralf-at-arista-dot-com with "cvp_getarp" in the subject.
 #
@@ -124,11 +126,21 @@ args.add_argument(
     help="Verbose level 1 or 2",
 )
 #
+args.add_argument(
+    "-x",
+    "--exclude",
+    dest="exintf",
+    action="store",
+    required=False,
+    help="Exclude an interface",
+)
+#
 # Prepare the arguments
 #
 opts = args.parse_args()
 host = opts.cvphost
 user = opts.user
+ExclIntf=opts.exintf
 passwd = opts.passwd
 targetdevs = opts.targetdev
 targetarp="ALL"
@@ -251,17 +263,19 @@ for i in range(len(Mdevice_list)):
             arp=arpitem[j]
             verbose_func(verbose,"arp="+str(arp))
             if type(arp)==dict:
-                verbose_func(verbose,"arp="+str(arp.keys()))
+                verbose_func(verbose,"arpkeys="+str(arp.keys()))
                 keydic=arp['key']
                 arpip=keydic['addr']
                 valuedic=arp['value']
                 arpmac=valuedic['ethAddr']
-                verbose_func(verbose,"Arp+mac="+arpip+" "+arpmac)
-                if targetarp=="ALL":
+                arpintf=keydic['intfId']
+                verbose_func(verbose,"Arp+mac+Interface="+arpip+" "+arpmac+" "+arpintf)
+                xFlag=str(arpintf) not in str(ExclIntf)
+                if xFlag and targetarp=="ALL":
                     ResultArp.append(arpip)
                     ResultMac.append(arpmac)
                     ResultDev.append(Tdevice_list[i])
-                if arpip==targetarp:
+                if xFlag and arpip==targetarp:
                     ResultArp.append(arpip)
                     ResultMac.append(arpmac)
                     ResultDev.append(Tdevice_list[i])

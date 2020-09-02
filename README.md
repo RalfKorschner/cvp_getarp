@@ -5,7 +5,7 @@ Even though this script is best effort supported, please send any issues you fin
 
 This tool can be used to retireve the ARP Table from CVP instread of an EOS device.
 
-Tested with CVP Versions 2019, 2020.1
+Tested with CVP Versions 2019, 2020.1 2020.1.1
 
 Below is an explanation of all command line options to `cvp_getarp.py`:
 
@@ -19,6 +19,8 @@ Below is an explanation of all command line options to `cvp_getarp.py`:
   -d TARGETDEV, --device TARGETDEV
                         Target Devices IP(s) or Device hostname(s), -d
                         leaf1[,leaf2]
+  -x INTERFACE --exclude INTERFACE
+                        Exclude an specific interface on device=TARGETDEV
   -a TARGETARP, --arp TARGETARP
                         ARP address to be checked. If omitted all ARP entries will be showm.
   -v {1,2}, --verbose {1,2}
